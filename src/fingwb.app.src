@@ -1,0 +1,12 @@
+{application, fingwb,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { fingwb_app, []}},
+  {env, []}
+ ]}.
