@@ -2,7 +2,7 @@
  [
   {description, ""},
   {vsn, "1"},
-  {registered, []},
+  {registered, [fingwb]},
   {applications, [
                   kernel,
                   stdlib,
