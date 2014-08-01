@@ -17,7 +17,7 @@ start(_StartType, _StartArgs) ->
 			{"/static/[...]", cowboy_static, {priv_dir, websocket, "static"}}
 		]}
 	]),
-    {ok, _} = cowboy:start_http(http, 100, [{port, 8080}],
+    {ok, _} = cowboy:start_http(http, 25, [{port, 8080}],
         [{env, [{dispatch, Dispatch}]}]),
     fingwb_sup:start_link().
 
