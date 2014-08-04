@@ -1,1 +1,3 @@
-<html></Html>
+<html>
+{{ whiteboard_id }}
+</html>
