@@ -13,8 +13,8 @@ start(_StartType, _StartArgs) ->
     Dispatch = cowboy_router:compile([
 	    {'_', [
 			{"/", fingwb_create, []},
-			{"/:whiteboard_id", fingwb_canvas, []},
 			{"/ws", fingwb_msg_handler, []},
+			{"/:whiteboard_id", fingwb_canvas, []},
 			{"/static/[...]", cowboy_static, {priv_dir, fingwb, "static"}}
 		]}
 	]),
