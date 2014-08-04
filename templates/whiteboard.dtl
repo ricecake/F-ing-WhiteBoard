@@ -4,7 +4,7 @@
 		<script type="text/javascript" src="static/whiteboard.js"></script>
 		<script type="text/css"        src="static/whiteboard.css"></script>
 	</head>
-<body>
-	{{ whiteboard_id }}
+<body data-whiteboard="{{ whiteboard_id }}" >
+	Hello!
 </body>
 </html>

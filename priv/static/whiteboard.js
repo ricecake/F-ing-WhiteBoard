@@ -5,7 +5,6 @@
 	$(document).ready(init);
 
 	function init() {
-		alert("Start!");
 		initWs();
 		initCanvas();
 	}
