@@ -18,6 +18,7 @@ websocket_init(_TransportName, Req, _Opts) ->
 	{WhiteBoardId, Req2} = cowboy_req:binding(whiteboard_id, Req),
 	ok = fingwb_whiteboard:watch(WhiteBoardId),
         ok = fingwb_whiteboard:publish(WhiteBoardId, {join, self()}),
+[ self() ! {join, Pid}|| Pid <- fingwb_whiteboard:watchers(WhiteBoardId)],
 	{ok, Req2, #ws_state{id=WhiteBoardId}}.
 
 websocket_handle({text, Msg}, Req, State) ->
@@ -26,10 +27,6 @@ websocket_handle(_Data, Req, State) ->
 	{ok, Req, State}.
 
 websocket_info({join, Pid}, Req, State) ->
-	case self() of
-		Pid -> ok;
-		_   -> Pid ! {join, self()}
-	end,
 	{reply, {text, jiffy:encode({[{<<"join">>, list_to_binary(pid_to_list(Pid))}]})}, Req, State};
 websocket_info(_Info, Req, State) ->
 	{ok, Req, State}.
