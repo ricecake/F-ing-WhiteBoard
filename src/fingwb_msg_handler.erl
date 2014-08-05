@@ -24,9 +24,12 @@ websocket_handle({text, Msg}, Req, State) ->
 websocket_handle(_Data, Req, State) ->
 	{ok, Req, State}.
 
-websocket_info({timeout, _Ref, Msg}, Req, State) ->
-	erlang:start_timer(1000, self(), <<"How' you doin'?">>),
-	{reply, {text, Msg}, Req, State};
+websocket_info({join, Pid}, Req, State) ->
+	case self() of
+		Pid -> ok;
+		_   -> Pid ! {join, self()}
+	end,
+	{reply, {text, jiffy:encode({[{<<"join">>, list_to_binary(pid_to_list(Pid))}]})}, Req, State};
 websocket_info(_Info, Req, State) ->
 	{ok, Req, State}.
 

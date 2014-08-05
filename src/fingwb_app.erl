@@ -10,6 +10,7 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+    fingwb_whiteboard:init([]),
     Dispatch = cowboy_router:compile([
 	    {'_', [
 			{"/", fingwb_create, []},

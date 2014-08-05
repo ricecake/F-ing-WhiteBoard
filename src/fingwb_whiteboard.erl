@@ -50,13 +50,15 @@ creator() ->
 	end.
 
 watch(Id) when is_binary(Id) ->
-	{atomic, Result} = mnesia:transaction(fun()->
+	{atomic, ok} = mnesia:transaction(fun()->
 		case mnesia:read({board, Id}) of
 			[] -> undefined;
 			_  -> mnesia:write(#watcher{pid=self(), board_id=Id})
 		end
 	end),
-	Result.
+	{atomic, Watchers} = mnesia:transaction(fun()-> mnesia:match_object(#watcher{ pid='_', board_id=Id}) end),
+	[Pid ! {join, self()} || #watcher{pid=Pid} <- Watchers],
+	ok.
 
 unWatch(Id) when is_binary(Id) ->
 	{atomic, Result} = mnesia:transaction(fun()->
