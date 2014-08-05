@@ -1,26 +1,27 @@
 -module(fingwb_whiteboard).
 
--export([init/1]).
+-export([init/1, create/1]).
 
 -record(board, {
-	id
+	id,
 	epoch
 }).
 
 -record(watcher, {
-	pid
+	pid,
 	board_id
 }).
 
--define(tables, [
+-define(Tables, [
 	{board,   [{attributes, record_info(fields, board)}]},
-	{watcher, [{attributes, record_info(fields, watcher)}]},
+	{watcher, [{attributes, record_info(fields, watcher)}]}
 ]).
 
 init([]) ->
-	ok = case mnesia:create_schema([node()]) of
+	Node = node(),
+	ok = case mnesia:create_schema([Node]) of
 		ok -> ok;
-		{error, {node(), {already_exists, node()}}} -> ok;
+		{error, {Node, {already_exists, Node}}} -> ok;
 		_ -> error
 	end,
 	ok = mnesia:start(),
@@ -31,5 +32,14 @@ init([]) ->
 			{aborted, Reason} -> Reason
 		end
 	end,
-	[ok = CreateTable(Table) || Table <- ?tables],
+	[ok = CreateTable(Table) || Table <- ?Tables ],
 	ok.
+
+create(Id) when is_binary(Id) ->
+	{atomic, ok} = mnesia:transaction(fun()->
+		mnesia:write({board, Id, timestamp()})
+	end),
+	ok.
+
+
+timestamp() -> {Mega, Secs, Micro} = erlang:now(),  Mega*1000*1000*1000*1000 + Secs * 1000 * 1000 + Micro.

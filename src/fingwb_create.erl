@@ -5,7 +5,8 @@
 init(_Type, Req, []) -> {ok, Req, undefined}.
 
 handle(Req, State) ->
-	{ok, Reply} = cowboy_req:reply(302, [{<<"Location">>, <<"/", (getNewId())/binary >>}],
+	NewBoard = getNewId(),
+	{ok, Reply} = cowboy_req:reply(302, [{<<"Location">>, <<"/", (NewBoard)/binary >>}],
 		<<"Creating New WhiteBoard...">>, Req),
 	{ok, Reply, State}.
 
