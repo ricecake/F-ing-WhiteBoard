@@ -21,15 +21,16 @@ websocket_init(_TransportName, Req, _Opts) ->
 	ok = fingwb_whiteboard:publish(WhiteBoardId, {join, self()}),
 	{ok, Req2, #ws_state{id=WhiteBoardId}}.
 
-websocket_handle({text, Msg}, Req, State) ->
-	{reply, {text, << "That's what she said! ", Msg/binary >>}, Req, State};
-websocket_handle(_Data, Req, State) ->
+websocket_handle(Data, Req, State = #ws_state{id=WbId}) ->
+	ok = fingwb_whiteboard:publish(WbId, Data),
 	{ok, Req, State}.
 
 websocket_info({join, Pid}, Req, State) ->
 	{reply, {text, jiffy:encode({[{<<"join">>, list_to_binary(pid_to_list(Pid))}]})}, Req, State};
-websocket_info(_Info, Req, State) ->
-	{ok, Req, State}.
+websocket_info({leave, Pid}, Req, State) ->
+	{reply, {text, jiffy:encode({[{<<"leave">>, list_to_binary(pid_to_list(Pid))}]})}, Req, State};
+websocket_info(Message, Req, State) ->
+	{reply, Message, Req, State}.
 
 websocket_terminate(_Reason, _Req, #ws_state{id=WbId}) ->
 	fingwb_whiteboard:unWatch(WbId),
