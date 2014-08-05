@@ -5,11 +5,10 @@
 init(_Type, Req, []) -> {ok, Req, undefined}.
 
 handle(Req, State) ->
-	NewBoard = getNewId(),
+	{ok, {NewBoard, _TimeStamp}} = fingwb_whiteboard:create(),
 	{ok, Reply} = cowboy_req:reply(302, [{<<"Location">>, <<"/", (NewBoard)/binary >>}],
 		<<"Creating New WhiteBoard...">>, Req),
 	{ok, Reply, State}.
 
 terminate(_Reason, _Req, _State) -> ok.
 
-getNewId() -> erlang:integer_to_binary(binary:decode_unsigned(crypto:rand_bytes(8)), 36).

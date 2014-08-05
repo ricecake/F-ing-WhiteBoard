@@ -10,7 +10,8 @@
 	}
 	
 	function initWs() {
-		ws = new WebSocket("ws://" + window.location.host + "/ws");
+		var WhiteBoardId = $('body').data('whiteboard');
+		ws = new WebSocket("ws://" + window.location.host + "/ws/" + WhiteBoardId);
 		ws.onopen = function(evt) { onOpen(evt) }; 
 		ws.onclose = function(evt) { onClose(evt) }; 
 		ws.onmessage = function(evt) { onMessage(evt) }; 

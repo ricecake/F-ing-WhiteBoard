@@ -1,6 +1,6 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0]).
+-export([init/1, create/0, watch/1, unWatch/1]).
 
 -record(board, {
 	id,
@@ -48,6 +48,24 @@ creator() ->
 			{ok, {Id, TimeStamp}};
 		_  -> creator()
 	end.
+
+watch(Id) when is_binary(Id) ->
+	{atomic, Result} = mnesia:transaction(fun()->
+		case mnesia:read({board, Id}) of
+			[] -> undefined;
+			_  -> mnesia:write(#watcher{pid=self(), board_id=Id})
+		end
+	end),
+	Result.
+
+unWatch(Id) when is_binary(Id) ->
+	{atomic, Result} = mnesia:transaction(fun()->
+		case mnesia:read({board, Id}) of
+			[] -> undefined;
+			_  -> mnesia:delete({watcher, self()})
+		end
+	end),
+	Result.
 
 getNewId() -> erlang:integer_to_binary(binary:decode_unsigned(crypto:rand_bytes(8)), 36).
 timestamp() -> {Mega, Secs, Micro} = erlang:now(),  Mega*1000*1000*1000*1000 + Secs * 1000 * 1000 + Micro.
