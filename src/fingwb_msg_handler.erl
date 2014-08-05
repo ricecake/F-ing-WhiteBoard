@@ -17,6 +17,7 @@ init({tcp, http}, _Req, _Opts) ->
 websocket_init(_TransportName, Req, _Opts) ->
 	{WhiteBoardId, Req2} = cowboy_req:binding(whiteboard_id, Req),
 	ok = fingwb_whiteboard:watch(WhiteBoardId),
+        ok = fingwb_whiteboard:publish(WhiteBoardId, {join, self()}),
 	{ok, Req2, #ws_state{id=WhiteBoardId}}.
 
 websocket_handle({text, Msg}, Req, State) ->
