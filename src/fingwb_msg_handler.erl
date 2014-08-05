@@ -32,4 +32,5 @@ websocket_info(_Info, Req, State) ->
 	{ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, #ws_state{id=WbId}) ->
-	fingwb_whiteboard:unWatch(WbId).
+	fingwb_whiteboard:unWatch(WbId),
+        fingwb_whiteboard:publish(WbId, {leave, self()}).
