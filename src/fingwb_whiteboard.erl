@@ -73,18 +73,18 @@ publish(Id, Message) when is_binary(Id) ->
 			[] -> undefined;
 			_  -> mnesia:match_object(#watcher{ pid='_', board_id=Id})
 		end
-        end),
+	end),
 	[Pid ! Message || #watcher{pid=Pid} <- Watchers],
-        ok.
+	ok.
 
-  Watchers(Id) when is_binary(Id) ->
+watchers(Id) when is_binary(Id) ->
 	{atomic, Watchers} = mnesia:transaction(fun()->
 		case mnesia:read({board, Id}) of
 			[] -> undefined;
 			_  -> mnesia:match_object(#watcher{ pid='_', board_id=Id})
 		end
-        end),
-	Watchers.
+	end),
+	[ Pid || #watcher{pid=Pid} <- Watchers].
 
 getNewId() -> erlang:integer_to_binary(binary:decode_unsigned(crypto:rand_bytes(8)), 36).
 timestamp() -> {Mega, Secs, Micro} = erlang:now(),  Mega*1000*1000*1000*1000 + Secs * 1000 * 1000 + Micro.

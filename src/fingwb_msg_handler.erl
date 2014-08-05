@@ -16,9 +16,9 @@ init({tcp, http}, _Req, _Opts) ->
 
 websocket_init(_TransportName, Req, _Opts) ->
 	{WhiteBoardId, Req2} = cowboy_req:binding(whiteboard_id, Req),
+	[ self() ! {join, Pid}|| Pid <- fingwb_whiteboard:watchers(WhiteBoardId)],
 	ok = fingwb_whiteboard:watch(WhiteBoardId),
-        ok = fingwb_whiteboard:publish(WhiteBoardId, {join, self()}),
-[ self() ! {join, Pid}|| Pid <- fingwb_whiteboard:watchers(WhiteBoardId)],
+	ok = fingwb_whiteboard:publish(WhiteBoardId, {join, self()}),
 	{ok, Req2, #ws_state{id=WhiteBoardId}}.
 
 websocket_handle({text, Msg}, Req, State) ->
@@ -33,4 +33,4 @@ websocket_info(_Info, Req, State) ->
 
 websocket_terminate(_Reason, _Req, #ws_state{id=WbId}) ->
 	fingwb_whiteboard:unWatch(WbId),
-        fingwb_whiteboard:publish(WbId, {leave, self()}).
+	fingwb_whiteboard:publish(WbId, {leave, self()}).
