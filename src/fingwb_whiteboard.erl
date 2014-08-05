@@ -1,6 +1,6 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/1]).
+-export([init/1, create/0]).
 
 -record(board, {
 	id,
@@ -35,11 +35,19 @@ init([]) ->
 	[ok = CreateTable(Table) || Table <- ?Tables ],
 	ok.
 
-create(Id) when is_binary(Id) ->
-	{atomic, ok} = mnesia:transaction(fun()->
-		mnesia:write({board, Id, timestamp()})
-	end),
-	ok.
+create() ->
+	{atomic, Result} = mnesia:transaction(fun creator/0),
+	Result.
 
+creator() ->
+	Id = getNewId(),
+	case mnesia:read({board, Id}) of
+		[] ->
+			TimeStamp = timestamp(),
+			ok = mnesia:write(#board{id=Id, epoch=TimeStamp}),
+			{ok, {Id, TimeStamp}};
+		_  -> creator()
+	end.
 
+getNewId() -> erlang:integer_to_binary(binary:decode_unsigned(crypto:rand_bytes(8)), 36).
 timestamp() -> {Mega, Secs, Micro} = erlang:now(),  Mega*1000*1000*1000*1000 + Secs * 1000 * 1000 + Micro.
