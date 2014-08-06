@@ -15,10 +15,17 @@
 			ctx.stroke();
 		},
 		join: function (viewer) {
-			console.log(viewer);
+			var id = str2Col(viewer);
+			$('<div/>', {
+				'id': id,
+				'class': 'viewer'
+			}).css({
+				'background-color': "#"+id,
+			}).appendTo('#viewers');
 		},
 		leave:  function (viewer) {
-			console.log(viewer);
+			var id = str2Col(viewer);
+			$('#' + id).remove();
 		}
 	};
 	function init() {
@@ -39,8 +46,9 @@
 	}
 
 	function onClose(e) {
-		console.log(e);
-		initWs();
+		window.setTimeout(function(){
+			initWs();
+		}, 1000);
 	}
 
 	function onMessage(e) {
@@ -135,5 +143,10 @@
 		segment.color = color;
 		segment.width = 5;
 		ws.send(JSON.stringify({draw: segment}));
+	}
+	function str2Col (str) {
+	    for (var i = 0, hash = 0; i < str.length; hash = str.charCodeAt(i++) + ((hash << 5) - hash));
+	    for (var i = 0, colour = ""; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
+	    return colour;
 	}
 }());
