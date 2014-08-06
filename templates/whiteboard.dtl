@@ -1,10 +1,10 @@
 <html>
 	<head>
+		<link rel="stylesheet" type="text/css"        href="static/whiteboard.css" media="all">
 		<script type="text/javascript" src="static/jquery-2.1.1.min.js"></script>
 		<script type="text/javascript" src="static/whiteboard.js"></script>
-		<script type="text/css"        src="static/whiteboard.css"></script>
 	</head>
-<body data-whiteboard="{{ whiteboard_id }}" >
-	Hello!
-</body>
+	<body data-whiteboard="{{ whiteboard_id }}" >
+		<canvas id='canvas' width="1024" height="768"></canvas>
+	</body>
 </html>
