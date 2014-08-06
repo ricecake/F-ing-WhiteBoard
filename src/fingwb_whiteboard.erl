@@ -1,6 +1,6 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0, watch/1, unWatch/1, publish/2, watchers/1]).
+-export([init/1, create/0, watch/1, unWatch/1, publish/2, notify/2, watchers/1, readArchive/1]).
 
 -record(board, {
 	id,
@@ -12,9 +12,16 @@
 	board_id
 }).
 
+-record(archive, {
+	id,
+	board_id,
+	data
+}).
+
 -define(Tables, [
 	{board,   [{attributes, record_info(fields, board)}]},
-	{watcher, [{attributes, record_info(fields, watcher)}]}
+	{watcher, [{attributes, record_info(fields, watcher)}]},
+	{archive, [{attributes, record_info(fields, archive)}]}
 ]).
 
 init([]) ->
@@ -49,6 +56,13 @@ creator() ->
 		_  -> creator()
 	end.
 
+delete(Id) when is_binary(Id) ->
+	{atomic, Result} = mnesia:transaction(fun()->
+		[ok = mnesia:delete_object(Row) || Row <- mnesia:match_object(#archive{board_id=Id, _='_'})],
+		ok = mnesia:delete({board, Id})
+	end),
+	Result.
+
 watch(Id) when is_binary(Id) ->
 	{atomic, Result} = mnesia:transaction(fun()->
 		case mnesia:read({board, Id}) of
@@ -65,9 +79,26 @@ unWatch(Id) when is_binary(Id) ->
 			_  -> mnesia:delete({watcher, self()})
 		end
 	end),
+	ok = case watchers(Id) of
+		[] -> delete(Id);
+		_  -> ok
+	end,
 	Result.
 
 publish(Id, Message) when is_binary(Id) ->
+	{ok, ZipMsg} = snappy:compress(erlang:term_to_binary(Message)),
+	{atomic, Watchers} = mnesia:transaction(fun()->
+		case mnesia:read({board, Id}) of
+			[] -> undefined;
+			_  ->
+				ok = mnesia:write(#archive{id={Id, timestamp(), getNewId()}, board_id=Id, data=ZipMsg }),
+				mnesia:match_object(#watcher{ pid='_', board_id=Id})
+		end
+	end),
+	[Pid ! Message || #watcher{pid=Pid} <- Watchers],
+	ok.
+
+notify(Id, Message) when is_binary(Id) ->
 	{atomic, Watchers} = mnesia:transaction(fun()->
 		case mnesia:read({board, Id}) of
 			[] -> undefined;
@@ -76,6 +107,17 @@ publish(Id, Message) when is_binary(Id) ->
 	end),
 	[Pid ! Message || #watcher{pid=Pid} <- Watchers],
 	ok.
+
+readArchive(Id) when is_binary(Id) ->
+	{atomic, Archive} = mnesia:transaction(fun()->
+		case mnesia:read({board, Id}) of
+			[] -> undefined;
+			_  -> mnesia:match_object(#archive{ board_id=Id, _='_' })
+		end
+	end),
+	[ erlang:binary_to_term(Zipped) || {ok, Zipped} <-[
+		snappy:decompress(Data) || #archive{data=Data} <- lists:sort(fun(#archive{id=Aid}, #archive{id=Bid})-> Aid >= Bid end, Archive)]
+	].
 
 watchers(Id) when is_binary(Id) ->
 	{atomic, Watchers} = mnesia:transaction(fun()->
