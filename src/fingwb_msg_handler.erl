@@ -16,11 +16,15 @@ init({tcp, http}, _Req, _Opts) ->
 
 websocket_init(_TransportName, Req, _Opts) ->
 	{WhiteBoardId, Req2} = cowboy_req:binding(whiteboard_id, Req),
-	[ self() ! {join, Pid}|| Pid <- fingwb_whiteboard:watchers(WhiteBoardId)],
-	ok = fingwb_whiteboard:watch(WhiteBoardId),
-	ok = fingwb_whiteboard:notify(WhiteBoardId, {join, self()}),
-	[ self() ! Message || Message <- fingwb_whiteboard:readArchive(WhiteBoardId)],
-	{ok, Req2, #ws_state{id=WhiteBoardId}}.
+	case fingwb_whiteboard:exists(WhiteBoardId) of
+		false -> {shutdown, Req2};
+		true  ->
+			[ self() ! {join, Pid}|| Pid <- fingwb_whiteboard:watchers(WhiteBoardId)],
+			ok = fingwb_whiteboard:watch(WhiteBoardId),
+			ok = fingwb_whiteboard:notify(WhiteBoardId, {join, self()}),
+			[ self() ! Message || Message <- fingwb_whiteboard:readArchive(WhiteBoardId)],
+			{ok, Req2, #ws_state{id=WhiteBoardId}}
+	end.
 
 websocket_handle(Data, Req, State = #ws_state{id=WbId}) ->
 	ok = fingwb_whiteboard:publish(WbId, Data),
