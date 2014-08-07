@@ -1,0 +1,9 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css"        href="static/whiteboard.css" media="all">
+	</head>
+	<body>
+	Unfortunately, the whiteboard '{{ whiteboard_id }}' could not be found!</br>
+	<a href="/new">Create a new one?</a>
+	</body>
+</html>
