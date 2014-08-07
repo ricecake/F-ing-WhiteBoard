@@ -124,7 +124,7 @@ readArchive(Id) when is_binary(Id) ->
 		end
 	end),
 	[ erlang:binary_to_term(Zipped) || {ok, Zipped} <-[
-		snappy:decompress(Data) || #archive{data=Data} <- lists:sort(fun(#archive{id=Aid}, #archive{id=Bid})-> Aid >= Bid end, Archive)]
+		snappy:decompress(Data) || #archive{data=Data} <- lists:sort(fun(#archive{id=Aid}, #archive{id=Bid})-> Bid >= Aid end, Archive)]
 	].
 
 watchers(Id) when is_binary(Id) ->
