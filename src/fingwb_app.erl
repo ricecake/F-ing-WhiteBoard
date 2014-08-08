@@ -11,6 +11,7 @@
 
 start(_StartType, _StartArgs) ->
     fingwb_whiteboard:init([]),
+    fingwb_sup:start_link(),
     Dispatch = cowboy_router:compile([
 	    {'_', [
 			{"/", cowboy_static, {priv_file, fingwb, "index.html"}},
@@ -21,8 +22,7 @@ start(_StartType, _StartArgs) ->
 		]}
 	]),
 	{ok, _} = cowboy:start_http(http, 25, [{ip, {127,0,0,1}}, {port, 8080}],
-        [{env, [{dispatch, Dispatch}]}]),
-    fingwb_sup:start_link().
+        [{env, [{dispatch, Dispatch}]}]).
 
 stop(_State) ->
     ok.
