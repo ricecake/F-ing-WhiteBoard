@@ -51,12 +51,12 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 %% Internal Function Definitions
 %% ------------------------------------------------------------------
 
-dispatch([Job|Rest], Owner) ->
-	ok = handleTask(Job, Owner),
-	dispatch(Rest, Owner);
-dispatch([{Verb, Data}], Owner) -> 
+dispatchWork([{Verb, Data}], Owner) -> 
 	ok = process(Verb, Data, Owner),
-	normal.
+	normal;
+dispatchWork([Job|Rest], Owner) ->
+	ok = handleTask(Job, Owner),
+	dispatchWork(Rest, Owner).
 
 handleTask(Job, Owner) ->
 	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [Owner]),
