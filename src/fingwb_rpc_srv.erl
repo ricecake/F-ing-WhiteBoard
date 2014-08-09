@@ -29,36 +29,43 @@ start_link(Pid) ->
 init(Owner) ->
     {ok, Owner}.
 
-handle_call(_Request, _From, State) ->
-    {reply, ok, State}.
-
 handle_cast({process, JSON}, Owner) ->
 	Reason = try jiffy:decode(JSON) of
-		{Entries} when is_list(Entries) ->
-			[handleTask(Item, Owner) || Item <- Entries],
-			normal
+		{Entries} when is_list(Entries) -> dispatchWork(Entries, Owner)
 	catch
 		_ -> inapplicable
 	end,
 	{stop, Reason, Owner};
-
+handle_cast({Verb, Data}, Owner) ->
+	ok = process(Verb, Data, Owner),
+	{stop, normal, Owner};
 handle_cast(_Msg, State) ->
-    {stop, error, State}.
+	{stop, inapplicable, State}.
 
-handle_info(_Info, State) ->
-    {stop, error, State}.
-
-terminate(_Reason, _State) ->
-    ok.
-
-code_change(_OldVsn, State, _Extra) ->
-    {ok, State}.
+handle_call(_Request, _From, State) -> {stop, error, State}.
+handle_info(_Info, State) -> {stop, error, State}.
+terminate(_Reason, _State) -> ok.
+code_change(_OldVsn, State, _Extra) -> {ok, State}.
 
 %% ------------------------------------------------------------------
 %% Internal Function Definitions
 %% ------------------------------------------------------------------
 
+dispatch([Job|Rest], Owner) ->
+	ok = handleTask(Job, Owner),
+	dispatch(Rest, Owner);
+dispatch([{Verb, Data}], Owner) -> 
+	ok = process(Verb, Data, Owner),
+	normal.
+
 handleTask(Job, Owner) ->
-	{ok, Worker} = supervisor:start_child(fingwb_rpc_worker_sup, [Owner]),
+	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [Owner]),
 	gen_server:cast(Worker, Job).
+
+process(_Verb, _Data, _Owner) -> ok.
+
+subProcess(Verb, Data, Owner) when is_list(Data) ->
+	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [Owner]),
+	[ ok = gen_server:cast(Worker, {Verb, Job}) || Job <- Data ],
+	ok.
 
