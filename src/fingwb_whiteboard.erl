@@ -1,9 +1,10 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, readArchive/1]).
+-export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, claim/1, publish/2, notify/2, watchers/1, readArchive/1]).
 
 -record(board, {
 	id,
+	agent=undefined,
 	epoch
 }).
 
@@ -102,6 +103,13 @@ unWatch(Id) when is_binary(Id) ->
 		[] -> {ok, _} = timer:apply_after(10000, fingwb_whiteboard, delete, [Id]), ok;
 		_  -> ok
 	end,
+	Result.
+
+claim(Id) when is_binary(Id) ->
+	{atomic, Result} = mnesia:transaction(fun()->
+		[Board] = mnesia:read({board, Id}),
+		mnesia:write(Board#board{agent=self()})
+	end),
 	Result.
 
 publish(Id, Message) when is_binary(Id) ->

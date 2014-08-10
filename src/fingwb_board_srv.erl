@@ -27,7 +27,8 @@ start_link(Board) ->
 %% ------------------------------------------------------------------
 
 init(Board) ->
-    {ok, Board}.
+	ok = fingwb_whiteboard:claim(Board),
+	{ok, Board}.
 
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
