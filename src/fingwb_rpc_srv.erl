@@ -33,7 +33,7 @@ handle_cast({process, JSON}, Owner) ->
 	Reason = try jiffy:decode(JSON) of
 		{Entries} when is_list(Entries) -> dispatchWork(Entries, Owner)
 	catch
-		_ -> inapplicable
+		_ -> normal
 	end,
 	{stop, Reason, Owner};
 handle_cast({Verb, Data}, Owner) ->
