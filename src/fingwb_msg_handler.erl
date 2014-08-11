@@ -28,8 +28,8 @@ websocket_init(_TransportName, Req, _Opts) ->
 			{ok, Req2, #ws_state{id=WhiteBoardId}}
 	end.
 
-websocket_handle(Data, Req, State = #ws_state{id=WbId}) ->
-	handle_client_task(Data),
+websocket_handle({_Type, JSON} = Data, Req, State = #ws_state{id=WbId}) ->
+	handle_client_task(JSON),
 	ok = fingwb_whiteboard:publish(WbId, Data),
 	{ok, Req, State}.
 
