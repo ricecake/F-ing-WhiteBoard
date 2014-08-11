@@ -45,8 +45,8 @@ init([]) ->
 
 create() ->
 	{atomic, Result} = mnesia:transaction(fun creator/0),
-	{Id, _Timestamp} = Result,
-	supervisor:start_child(fingwb_board_sup, [Id]),
+	{ok, {Id, _Timestamp}} = Result,
+	{ok, _Pid} = supervisor:start_child(fingwb_board_sup, [Id]),
 	Result.
 
 creator() ->

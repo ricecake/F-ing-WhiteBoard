@@ -51,7 +51,7 @@ code_change(_OldVsn, State, _Extra) -> {ok, State}.
 %% Internal Function Definitions
 %% ------------------------------------------------------------------
 
-dispatchWork([{Verb, Data}], Owner) -> 
+dispatchWork([{Verb, Data}], Owner) ->
 	ok = process(Verb, Data, Owner),
 	normal;
 dispatchWork([Job|Rest], Owner) ->
@@ -68,4 +68,3 @@ subProcess(Verb, Data, Owner) when is_list(Data) ->
 	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [Owner]),
 	[ ok = gen_server:cast(Worker, {Verb, Job}) || Job <- Data ],
 	ok.
-
