@@ -24,6 +24,5 @@ start_link() ->
 
 init([]) ->
 	{ok, { {one_for_one, 5, 10}, [
-		?CHILD(fingwb_rpc_sup, supervisor),
-		?CHILD(fingwb_board_sup, supervisor)
+		?CHILD(fingwb_rpc_sup, supervisor)
 	]} }.

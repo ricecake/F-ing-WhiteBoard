@@ -1,8 +1,8 @@
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css"        href="static/whiteboard.css" media="all">
-		<script type="text/javascript" src="static/jquery-2.1.1.min.js"></script>
-		<script type="text/javascript" src="static/whiteboard.js"></script>
+		<link rel="stylesheet" type="text/css"        href="static/css/whiteboard.css" media="all">
+		<script type="text/javascript" src="static/js/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="static/js/whiteboard.js"></script>
 	</head>
 	<body data-whiteboard="{{ whiteboard_id }}" >
 		<div id='info-bar'>
