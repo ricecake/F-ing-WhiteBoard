@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css"        href="static/whiteboard.css" media="all">
+		<link rel="stylesheet" type="text/css"        href="static/js/whiteboard.css" media="all">
 	</head>
 	<body>
 	Unfortunately, the whiteboard '{{ whiteboard_id }}' could not be found!</br>
