@@ -9,7 +9,7 @@
 	var verbs = {
 		draw: function(segment) {
 			ctx.strokeStyle = segment.color;
-			ctx.lineWidth = segment.width;
+			ctx.lineWidth   = segment.width;
 			ctx.beginPath();
 			ctx.moveTo(segment.x[0], segment.y[0]);
 			ctx.lineTo(segment.x[1], segment.y[1]);
@@ -163,7 +163,7 @@
 		$(window).on("mouseup", stop);
 	};
 	function draw (segment) {
-		segment.color = color;
+		segment.color = '#'+color;
 		segment.width = size;
 		ws.send(JSON.stringify({draw: segment}));
 	}
