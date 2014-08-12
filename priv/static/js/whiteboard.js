@@ -122,13 +122,15 @@
 		var clicked = 0;
 		var start = function(e) {
 			clicked = 1;
-			segment.x[0] = e.pageX;
-			segment.y[0] = e.pageY;
+			segment.x[0] = e.pageX-10;
+			segment.y[0] = e.pageY-10;
 		};
 		var move = function(e) {
 			if(clicked){
-				segment.x.push(e.pageX);
-				segment.y.push(e.pageY);
+				// Technically moving right results in the line being 'behind' the cursor while
+				// moving left results in the line just slightly ahead of the cursor
+				segment.x.push(e.pageX-10);
+				segment.y.push(e.pageY-10);
 				draw(segment);
 				segment.x.shift();
 				segment.y.shift();
