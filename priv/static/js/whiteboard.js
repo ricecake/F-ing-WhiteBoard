@@ -20,7 +20,7 @@
 				'id': id,
 				'class': 'viewer'
 			}).css({
-				'background-color': "#"+id,
+				'background-color': "#" + id,
 			}).appendTo('#viewers');
 		},
 		leave:  function (viewer) {
@@ -28,6 +28,8 @@
 			$('#' + id).remove();
 		}
 	};
+	
+	
 	function init() {
 		initWs();
 		initCanvas();
@@ -36,10 +38,10 @@
 	function initWs() {
 		var WhiteBoardId = $('body').data('whiteboard');
 		ws = new WebSocket("ws://" + window.location.host + "/ws/" + WhiteBoardId);
-		ws.onopen = function(evt) { onOpen(evt) }; 
-		ws.onclose = function(evt) { onClose(evt) }; 
-		ws.onmessage = function(evt) { onMessage(evt) }; 
-		ws.onerror = function(evt) { onError(evt) }; 
+		ws.onopen    = function(evt) { onOpen(evt);    };
+		ws.onclose   = function(evt) { onClose(evt);   };
+		ws.onmessage = function(evt) { onMessage(evt); };
+		ws.onerror   = function(evt) { onError(evt);   };
 	}
 	function onOpen(e) {
 		console.log(e);
@@ -120,13 +122,15 @@
 		var clicked = 0;
 		var start = function(e) {
 			clicked = 1;
-			segment.x[0] = e.pageX;
-			segment.y[0] = e.pageY;
+			segment.x[0] = e.pageX-10;
+			segment.y[0] = e.pageY-10;
 		};
 		var move = function(e) {
 			if(clicked){
-				segment.x.push(e.pageX);
-				segment.y.push(e.pageY);
+				// Technically moving right results in the line being 'behind' the cursor while
+				// moving left results in the line just slightly ahead of the cursor
+				segment.x.push(e.pageX-10);
+				segment.y.push(e.pageY-10);
 				draw(segment);
 				segment.x.shift();
 				segment.y.shift();
@@ -145,8 +149,9 @@
 		ws.send(JSON.stringify({draw: segment}));
 	}
 	function str2Col (str) {
-	    for (var i = 0, hash = 0; i < str.length; hash = str.charCodeAt(i++) + ((hash << 5) - hash));
-	    for (var i = 0, colour = ""; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
-	    return colour;
+		var i, hash, colour;
+		for (i = 0, hash = 0; i < str.length; hash = str.charCodeAt(i++) + ((hash << 5) - hash));
+		for (i = 0, colour = ""; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
+		return colour;
 	}
 }());
