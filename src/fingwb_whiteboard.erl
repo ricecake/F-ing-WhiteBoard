@@ -1,10 +1,10 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, claim/1, publish/2, notify/2, watchers/1, readArchive/1]).
+-export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, readArchive/1, prune/0]).
 
 -record(board, {
 	id,
-	agent=undefined,
+	used=false,
 	epoch
 }).
 
@@ -41,12 +41,11 @@ init([]) ->
 		end
 	end,
 	[ok = CreateTable(Table) || Table <- ?Tables ],
+	{ok, _TRef} = timer:apply_interval(30000, fingwb_whiteboard, prune, []),
 	ok.
 
 create() ->
 	{atomic, Result} = mnesia:transaction(fun creator/0),
-	{ok, {Id, _Timestamp}} = Result,
-	{ok, _Pid} = supervisor:start_child(fingwb_board_sup, [Id]),
 	Result.
 
 creator() ->
@@ -86,8 +85,10 @@ delete(Id) when is_binary(Id) ->
 watch(Id) when is_binary(Id) ->
 	{atomic, Result} = mnesia:transaction(fun()->
 		case mnesia:read({board, Id}) of
-			[] -> undefined;
-			_  -> mnesia:write(#watcher{pid=self(), board_id=Id})
+			[]    -> undefined;
+			[Row] ->
+				mnesia:write(#watcher{pid=self(), board_id=Id}),
+				mnesia:write(Row#board{used=true})
 		end
 	end),
 	Result.
@@ -103,13 +104,6 @@ unWatch(Id) when is_binary(Id) ->
 		[] -> {ok, _} = timer:apply_after(10000, fingwb_whiteboard, delete, [Id]), ok;
 		_  -> ok
 	end,
-	Result.
-
-claim(Id) when is_binary(Id) ->
-	{atomic, Result} = mnesia:transaction(fun()->
-		[Board] = mnesia:read({board, Id}),
-		mnesia:write(Board#board{agent=self()})
-	end),
 	Result.
 
 publish(Id, Message) when is_binary(Id) ->
@@ -154,6 +148,20 @@ watchers(Id) when is_binary(Id) ->
 		end
 	end),
 	[ Pid || #watcher{pid=Pid} <- Watchers].
+
+prune() ->
+	mnesia:transaction(fun()->
+		mnesia:foldl(
+			fun(#board{id=Id, used=false}, Acc)->
+				case watchers(Id) of
+					[] ->
+						delete(Id),
+						Acc+1;
+					_  -> Acc
+				end;
+			(#board{}, Acc)-> Acc
+		end, 0, board)
+	end).
 
 getNewId() -> erlang:integer_to_binary(binary:decode_unsigned(crypto:rand_bytes(8)), 36).
 timestamp() -> {Mega, Secs, Micro} = erlang:now(),  Mega*1000*1000*1000*1000 + Secs * 1000 * 1000 + Micro.
