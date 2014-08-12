@@ -20,7 +20,7 @@
 				'id': id,
 				'class': 'viewer'
 			}).css({
-				'background-color': "#"+id,
+				'background-color': "#" + id,
 			}).appendTo('#viewers');
 		},
 		leave:  function (viewer) {
@@ -28,6 +28,8 @@
 			$('#' + id).remove();
 		}
 	};
+	
+	
 	function init() {
 		initWs();
 		initCanvas();
@@ -36,10 +38,10 @@
 	function initWs() {
 		var WhiteBoardId = $('body').data('whiteboard');
 		ws = new WebSocket("ws://" + window.location.host + "/ws/" + WhiteBoardId);
-		ws.onopen = function(evt) { onOpen(evt) }; 
-		ws.onclose = function(evt) { onClose(evt) }; 
-		ws.onmessage = function(evt) { onMessage(evt) }; 
-		ws.onerror = function(evt) { onError(evt) }; 
+		ws.onopen    = function(evt) { onOpen(evt);    };
+		ws.onclose   = function(evt) { onClose(evt);   };
+		ws.onmessage = function(evt) { onMessage(evt); };
+		ws.onerror   = function(evt) { onError(evt);   };
 	}
 	function onOpen(e) {
 		console.log(e);
