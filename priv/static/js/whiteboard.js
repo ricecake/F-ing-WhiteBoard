@@ -3,6 +3,7 @@
 	var ws;
 	var ctx;
 	var color = '#000000';
+	var size  = 5;
 	$(document).ready(init);
 
 	var verbs = {
@@ -13,6 +14,10 @@
 			ctx.moveTo(segment.x[0], segment.y[0]);
 			ctx.lineTo(segment.x[1], segment.y[1]);
 			ctx.stroke();
+		},
+		clear: function() {
+			var canvas = $("#canvas")[0];
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
 		},
 		join: function (viewer) {
 			var id = str2Col(viewer);
@@ -65,7 +70,21 @@
 	}
 
 	function initCanvas() {
+		$('#clear-canvas').on('click', function() {
+			ws.send(JSON.stringify({clear: true}));
+		});
+		$('#size-control').on('change', function() {
+			size = $(this).val();
+		})
+		$('#colorpicker').ColorPicker({
+			flat: true,
+			color: color,
+			onChange: function(hsb, hex, rgb) {
+				color = hex;
+			}
+		});
 		ctx = $("#canvas")[0].getContext('2d');
+		ctx.lineCap = "round";
 		$("#canvas").drawTouch();
 		$("#canvas").drawPointer();
 		$("#canvas").drawMouse();
@@ -145,7 +164,7 @@
 	};
 	function draw (segment) {
 		segment.color = color;
-		segment.width = 5;
+		segment.width = size;
 		ws.send(JSON.stringify({draw: segment}));
 	}
 	function str2Col (str) {

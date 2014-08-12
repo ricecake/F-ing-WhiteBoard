@@ -62,6 +62,9 @@ handleTask(Job, Owner) ->
 	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [Owner]),
 	gen_server:cast(Worker, Job).
 
+process(<<"clear">>, _Dummy, {_Owner, WbId}) ->
+	fingwb_whiteboard:clear(WbId),
+	ok;
 process(_Verb, _Data, _Owner) -> ok.
 
 subProcess(Verb, Data, Owner) when is_list(Data) ->

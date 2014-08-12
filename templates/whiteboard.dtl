@@ -1,7 +1,9 @@
 <html>
 	<head>
 		<link rel="stylesheet" type="text/css" href="/css/whiteboard.css" media="all">
+		<link rel="stylesheet" type="text/css" href="css/colorpicker.css" media="screen" />
 		<script type="text/javascript" src="/js/lib/jquery-2.1.1.min.js"></script>
+		<script type="text/javascript" src="/js/colorpicker.js"></script>
 		<script type="text/javascript" src="/js/whiteboard.js"></script>
 	</head>
 	<body data-whiteboard="{{ whiteboard_id }}" >
@@ -9,5 +11,10 @@
 			<div id='viewers'></div>
 		</div>
 		<canvas id='canvas' width="1600" height="800"></canvas>
+		<div id='controls'>
+			<div id='colorpicker'></div>
+			<label for='size-control'>Size:</label><input id='size-control' type='text' value=5 >
+			<button id='clear-canvas' type='button'>Clear</button>
+		</div>
 	</body>
 </html>

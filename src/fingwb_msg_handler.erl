@@ -29,8 +29,8 @@ websocket_init(_TransportName, Req, _Opts) ->
 	end.
 
 websocket_handle({_Type, JSON} = Data, Req, State = #ws_state{id=WbId}) ->
-	handle_client_task(JSON),
 	ok = fingwb_whiteboard:publish(WbId, Data),
+	handle_client_task(JSON, WbId),
 	{ok, Req, State}.
 
 websocket_info({join, Pid}, Req, State) ->
@@ -44,8 +44,8 @@ websocket_terminate(_Reason, _Req, #ws_state{id=WbId}) ->
 	fingwb_whiteboard:notify(WbId, {leave, self()}),
 	fingwb_whiteboard:unWatch(WbId).
 
-handle_client_task(JSON) ->
-	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [self()]),
+handle_client_task(JSON, WbId) ->
+	{ok, Worker} = supervisor:start_child(fingwb_rpc_sup, [{self(), WbId}]),
 	gen_server:cast(Worker, {process, JSON}).
 
 tell(Worker, Message) -> Worker ! Message.

@@ -1,6 +1,6 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, readArchive/1, prune/0]).
+-export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, readArchive/1, prune/0, clear/1]).
 
 -record(board, {
 	id,
@@ -149,6 +149,12 @@ watchers(Id) when is_binary(Id) ->
 	end),
 	[ Pid || #watcher{pid=Pid} <- Watchers].
 
+clear(Id) when is_binary(Id) ->
+	{atomic, Result} = mnesia:transaction(fun()->
+		[ok = mnesia:delete_object(Row) || Row <- mnesia:match_object(#archive{board_id=Id, _='_'})],
+		ok
+	end),
+	Result.
 prune() ->
 	mnesia:transaction(fun()->
 		mnesia:foldl(
