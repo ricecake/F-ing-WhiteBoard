@@ -8,6 +8,4 @@ erl_crash.dump
 *~
 .rebar/
 rel/fingwb/
-deps/
-ebin/
 *.swp
