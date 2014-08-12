@@ -12,13 +12,16 @@ Installing:
 
 
 Using
------
+-------
 
 ### To Run 
-  ./rel/fingwb/bin/fingwb start
+    ./rel/fingwb/bin/fingwb start
 
 ### To Attach to Running Process
-  ./rel/fingwb/bin/fingwb attach
+    ./rel/fingwb/bin/fingwb attach
 
 ### To Stop 
-  ./rel/fingwb/bin/fingwb stop
+    ./rel/fingwb/bin/fingwb stop
+
+### To View
+    http://127.0.0.1:8080
