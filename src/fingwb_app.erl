@@ -14,7 +14,7 @@ start(_StartType, _StartArgs) ->
     {ok, Pid} = fingwb_sup:start_link(),
     Dispatch = cowboy_router:compile([
 	    {'_', [
-			{"/", cowboy_static, {priv_file, fingwb, "index.html"}},
+			{"/", fingwb_index, []},
 			{"/new", fingwb_create, []},
 			{"/ws/:whiteboard_id", fingwb_msg_handler, []},
 			{"/:whiteboard_id", fingwb_canvas, []},

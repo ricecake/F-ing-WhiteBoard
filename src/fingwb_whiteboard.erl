@@ -1,6 +1,6 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, readArchive/1, prune/0, clear/1]).
+-export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, list/0, readArchive/1, prune/0, clear/1]).
 
 -record(board, {
 	id,
@@ -155,6 +155,13 @@ clear(Id) when is_binary(Id) ->
 		ok
 	end),
 	Result.
+
+list() ->
+	{atomic, Boards} = mnesia:transaction(fun()->
+		mnesia:foldl(fun(#board{id=Id}, Acc)-> [Id|Acc] end, [], board)
+	end),
+	Boards.
+
 prune() ->
 	mnesia:transaction(fun()->
 		mnesia:foldl(

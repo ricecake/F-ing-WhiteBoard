@@ -1,0 +1,6 @@
+<html>
+	<a href="/new" ><h4>Create new whiteboard</h4></a>
+	{% for id in boards %}
+		<div class='whiteboard'><a href="{{ id }}"> Connect to: {{ id }}</a></div>
+	{% endfor %}
+</html>
