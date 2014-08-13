@@ -76,11 +76,14 @@
 		$('#size-control').on('change', function() {
 			size = $(this).val();
 		})
-		$('#colorpicker').ColorPicker({
-			flat: true,
-			color: color,
-			onChange: function(hsb, hex, rgb) {
-				color = hex;
+		$('#colorpicker').spectrum({
+			clickoutFiresChange: true,
+			showPalette: true,
+			change: function(newColor) {
+				color = newColor.toHexString();
+			},
+			move: function(newColor) {
+				color = newColor.toHexString();
 			}
 		});
 		ctx = $("#canvas")[0].getContext('2d');
@@ -163,7 +166,7 @@
 		$(window).on("mouseup", stop);
 	};
 	function draw (segment) {
-		segment.color = '#'+color;
+		segment.color = color;
 		segment.width = size;
 		ws.send(JSON.stringify({draw: segment}));
 	}
