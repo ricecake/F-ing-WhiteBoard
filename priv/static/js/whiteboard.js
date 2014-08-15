@@ -165,7 +165,24 @@
 		$(this).on("mousemove", move);
 		$(window).on("mouseup", stop);
 	};
-	function draw (segment) {
+	function draw (event) {
+		var segment = {
+			x: [],
+			y: []
+		};
+		//x: (evt.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
+		//y: (evt.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
+		var canvas = $("#canvas")[0];
+		var cbr = canvas.getBoundingClientRect();
+		for (var i=0; i<event.x.length; i++) {
+			var ex = event.x[i];
+			segment.x[i] = (ex-cbr.left)/(cbr.right-cbr.left)*canvas.width;
+		}
+		for (var i=0; i<event.y.length; i++) {
+			var ex = event.y[i];
+			segment.y[i] = (ex-cbr.top)/(cbr.bottom-cbr.top)*canvas.height;
+		}
+		console.log(segment);
 		segment.color = color;
 		segment.width = size;
 		ws.send(JSON.stringify({draw: segment}));
