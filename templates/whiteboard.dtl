@@ -7,7 +7,7 @@
 		<script src="/js/lib/jquery.mobile-1.4.3.min.js"></script>
 		<script src='/js/spectrum.js'></script>
 		<script type="text/javascript" src="/js/whiteboard.js"></script>
-		<meta name="viewport" content="width=1800, minimum-scale=0.01 maximum-scale=5">		
+		<meta name="viewport" content="width=2000, minimum-scale=0.01 maximum-scale=5">		
 		<title>
 			Fing WhiteBoard: {{ whiteboard_id }}
 		</title>
