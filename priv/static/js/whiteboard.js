@@ -2,7 +2,7 @@
 	'use strict';
 	var ws;
 	var ctx;
-	var color = '#000000';
+	var color = 'rgba(00,00,00,1)';
 	var size  = 5;
 	$(document).ready(init);
 
@@ -79,11 +79,12 @@
 		$('#colorpicker').spectrum({
 			clickoutFiresChange: true,
 			showPalette: true,
+                        showAlpha: true,
 			change: function(newColor) {
-				color = newColor.toHexString();
+				color = newColor.toRgbString();
 			},
 			move: function(newColor) {
-				color = newColor.toHexString();
+				color = newColor.toRgbString();
 			}
 		});
 		ctx = $("#canvas")[0].getContext('2d');
