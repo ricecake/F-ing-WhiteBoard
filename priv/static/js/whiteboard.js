@@ -9,7 +9,33 @@
 			ws: '',
 			canvas: {
 				ctx: '',
-				get: function (){ return $("#canvas")[0] }
+				get: function (){ return $("#canvas")[0] },
+				getImageData: function() {
+					var canvas = fingwb.global.canvas.get();
+					return canvas.getContext('2d').getImageData(0,0, canvas.width, canvas.height);
+				},
+				putImageData: function (data, x, y) {
+					x = x || 0;
+					y = y || 0;
+					var canvas = fingwb.global.canvas.get();
+					return canvas.getContext('2d').putImageData(data, x, y);
+				},
+				setPixel: function setPixel(imageData, x, y, r, g, b, a) {
+					index = (x + y * imageData.width) * 4;
+					imageData.data[index+0] = r;
+					imageData.data[index+1] = g;
+					imageData.data[index+2] = b;
+					imageData.data[index+3] = a;
+				},
+				getPixel: function setPixel(imageData, x, y) {
+					index = (x + y * imageData.width) * 4;
+					return [
+						imageData.data[index+0],
+						imageData.data[index+1],
+						imageData.data[index+2],
+						imageData.data[index+3]
+						];
+				}
 			}
 		},
 		mode: {
