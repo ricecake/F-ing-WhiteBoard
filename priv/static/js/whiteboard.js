@@ -1,39 +1,141 @@
 (function() {
 	'use strict';
-	var ws;
-	var ctx;
-	var color = 'rgba(00,00,00,1)';
-	var size  = 5;
-	$(document).ready(init);
-
-	var verbs = {
-		draw: function(segment) {
-			ctx.strokeStyle = segment.color;
-			ctx.lineWidth   = segment.width;
-			ctx.beginPath();
-			ctx.moveTo(segment.x[0], segment.y[0]);
-			ctx.lineTo(segment.x[1], segment.y[1]);
-			ctx.stroke();
+	var fingwb = {
+		setMode: function(mode) {
+			fingwb.mode[fingwb.mode.current].uninstall();
+			fingwb.mode[mode].install();
 		},
-		clear: function() {
-			var canvas = $("#canvas")[0];
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
+		global: {
+			ws: '',
+			canvas: {
+				ctx: '',
+				get: function (){ return $("#canvas")[0] }
+			}
 		},
-		join: function (viewer) {
-			var id = str2Col(viewer);
-			$('<div/>', {
-				'id': id,
-				'class': 'viewer'
-			}).css({
-				'background-color': "#" + id,
-			}).appendTo('#viewers');
+		mode: {
+			current: 'none',
+			start: 'draw',
+			draw: {
+				data: {
+					color: 'rgba(00,00,00,1)',
+					size: 5
+				},
+				install: function() {
+					var canvas = $(fingwb.global.canvas.get());
+					(function() {
+						var segment;
+						canvas.on("touchstart.fingwb.draw", function(e) {
+							e = e.originalEvent;
+							segment = fingwb.mode.draw.startSegment(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+						});
+						canvas.on("touchmove.fingwb.draw", function(e) {
+							e.preventDefault();
+							e = e.originalEvent;
+							segment = fingwb.mode.draw.addSegment(segment, e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+						});
+					})();
+					(function() {
+						var segment;
+						var start = function(e) {
+							e = e.originalEvent;
+							segment = fingwb.mode.draw.startSegment(e.pageX, e.pageY);;
+						};
+						var move = function(e) {
+							e.preventDefault();
+							e = e.originalEvent;
+							segment = fingwb.mode.draw.addSegment(segment, e.pageX, e.pageY);
+						};
+						canvas.on("MSPointerDown.fingwb.draw", start);
+						canvas.on("MSPointerMove.fingwb.draw", move);
+					})();
+					(function() {
+						var segment;
+						var clicked = 0;
+						canvas.on("mousedown.fingwb.draw", function(e) {
+							clicked = 1;
+							segment = fingwb.mode.draw.startSegment(e.pageX, e.pageY);
+						});
+						canvas.on("mousemove.fingwb.draw", function(e) {
+							if(clicked){
+								segment = fingwb.mode.draw.addSegment(segment, e.pageX, e.pageY);
+							}
+						});
+						$(window).on("mouseup.fingwb.draw", function(e) {
+							clicked = 0;
+						});
+					})();
+				},
+				uninstall: function() {},
+				startSegment: function(x, y) {
+					return {
+						x: [x],
+						y: [y]
+					};
+				},
+				addSegment: function(seg, x, y) {
+					seg.x.push(x);
+					seg.y.push(y);
+					fingwb.mode.draw.draw(seg);
+					seg.x.shift();
+					seg.y.shift();
+					return seg;
+				},
+				draw: function(event) {
+					var segment = {
+						color: fingwb.mode.draw.data.color,
+						width: fingwb.mode.draw.data.size,
+						x: [],
+						y: []
+					};
+					//x: (evt.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
+					//y: (evt.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
+					var canvas = fingwb.global.canvas.get();
+					var cbr = canvas.getBoundingClientRect();
+					for (var i=0; i<event.x.length; i++) {
+						var ex = event.x[i];
+						segment.x[i] = (ex-cbr.left)/(cbr.right-cbr.left)*canvas.width;
+					}
+					for (var i=0; i<event.y.length; i++) {
+						var ex = event.y[i];
+						segment.y[i] = (ex-cbr.top)/(cbr.bottom-cbr.top)*canvas.height;
+					}
+					fingwb.global.ws.send(JSON.stringify({draw: segment}));
+				}
+			},
+			none: {
+				install:   function(){},
+				uninstall: function(){}
+			}
 		},
-		leave:  function (viewer) {
-			var id = str2Col(viewer);
-			$('#' + id).remove();
-		}
+		verbs: {
+			draw: function(segment) {
+				fingwb.global.canvas.ctx.strokeStyle = segment.color;
+				fingwb.global.canvas.ctx.lineWidth   = segment.width;
+				fingwb.global.canvas.ctx.beginPath();
+				fingwb.global.canvas.ctx.moveTo(segment.x[0], segment.y[0]);
+				fingwb.global.canvas.ctx.lineTo(segment.x[1], segment.y[1]);
+				fingwb.global.canvas.ctx.stroke();
+			},
+			clear: function() {
+				var canvas = fingwb.global.canvas.get();
+				fingwb.global.canvas.ctx.clearRect(0, 0, canvas.width, canvas.height);
+			},
+			join: function (viewer) {
+				var id = str2Col(viewer);
+				$('<div/>', {
+					'id': id,
+					'class': 'viewer'
+				}).css({
+					'background-color': "#" + id,
+				}).appendTo('#viewers');
+			},
+			leave:  function (viewer) {
+				var id = str2Col(viewer);
+				$('#' + id).remove();
+			}
+		}		
 	};
-	
+	$(document).ready(init);
 	
 	function init() {
 		initWs();
@@ -42,31 +144,22 @@
 	
 	function initWs() {
 		var WhiteBoardId = $('body').data('whiteboard');
-		ws = new WebSocket("ws://" + window.location.host + "/ws/" + WhiteBoardId);
-		ws.onopen    = function(evt) { onOpen(evt);    };
-		ws.onclose   = function(evt) { onClose(evt);   };
-		ws.onmessage = function(evt) { onMessage(evt); };
-		ws.onerror   = function(evt) { onError(evt);   };
-	}
-	function onOpen(e) {
-		console.log(e);
-	}
-
-	function onClose(e) {
-		window.setTimeout(function(){
-			initWs();
-		}, 1000);
-	}
-
-	function onMessage(e) {
-		var message = JSON.parse(e.data);
-		for (var k in message) {
-			verbs[k](message[k]);
-		}
-	}
-
-	function onError(e) {
-		console.log(e);
+		var ws = new WebSocket("ws://" + window.location.host + "/ws/" + WhiteBoardId);
+		ws.onclose   = function(evt) {
+			window.setTimeout(function(){
+				initWs();
+			}, 1000);
+		};
+		ws.onmessage = 	function(e) {
+			var message = JSON.parse(e.data);
+			for (var k in message) {
+				fingwb.verbs[k](message[k]);
+			}
+		};
+		ws.onerror   = 	function(e) {
+			console.log(e);
+		};
+		fingwb.global.ws = ws;
 	}
 
 	function initCanvas() {
@@ -81,112 +174,16 @@
 			showPalette: true,
                         showAlpha: true,
 			change: function(newColor) {
-				color = newColor.toRgbString();
+				fingwb.mode.draw.data.color = newColor.toRgbString();
 			},
 			move: function(newColor) {
-				color = newColor.toRgbString();
+				fingwb.mode.draw.data.color = newColor.toRgbString();
 			}
 		});
-		ctx = $("#canvas")[0].getContext('2d');
-		ctx.lineCap = "round";
-		$("#canvas").drawTouch();
-		$("#canvas").drawPointer();
-		$("#canvas").drawMouse();
-	}
-	$.fn.drawTouch = function() {
-		var segment = {
-			x: [],
-			y: []
-		};
-		var start = function(e) {
-			e = e.originalEvent;
-			segment.x[0] = e.changedTouches[0].pageX;
-			segment.y[0] = e.changedTouches[0].pageY;
-		};
-		var move = function(e) {
-			e.preventDefault();
-			e = e.originalEvent;
-			segment.x.push(e.changedTouches[0].pageX);
-			segment.y.push(e.changedTouches[0].pageY);
-			draw(segment);
-			segment.x.shift();
-			segment.y.shift();
-		};
-		$(this).on("touchstart", start);
-		$(this).on("touchmove", move);
-	};
-	$.fn.drawPointer = function() {
-		var segment = {
-			x: [],
-			y: []
-		};
-		var start = function(e) {
-			e = e.originalEvent;
-			segment.x[0] = e.pageX;
-			segment.y[0] = e.pageY;
-		};
-		var move = function(e) {
-			e.preventDefault();
-			e = e.originalEvent;
-			segment.x.push(e.pageX);
-			segment.y.push(e.pageY);
-			draw(segment);
-			segment.x.shift();
-			segment.y.shift();
-		};
-		$(this).on("MSPointerDown", start);
-		$(this).on("MSPointerMove", move);
-	};
-	$.fn.drawMouse = function() {
-		var segment = {
-			x: [],
-			y: []
-		};
-		var clicked = 0;
-		var start = function(e) {
-			clicked = 1;
-			segment.x[0] = e.pageX;
-			segment.y[0] = e.pageY;
-		};
-		var move = function(e) {
-			if(clicked){
-				// Technically moving right results in the line being 'behind' the cursor while
-				// moving left results in the line just slightly ahead of the cursor
-				segment.x.push(e.pageX);
-				segment.y.push(e.pageY);
-				draw(segment);
-				segment.x.shift();
-				segment.y.shift();
-			}
-		};
-		var stop = function(e) {
-			clicked = 0;
-		};
-		$(this).on("mousedown", start);
-		$(this).on("mousemove", move);
-		$(window).on("mouseup", stop);
-	};
-	function draw (event) {
-		var segment = {
-			x: [],
-			y: []
-		};
-		//x: (evt.clientX-rect.left)/(rect.right-rect.left)*canvas.width,
-		//y: (evt.clientY-rect.top)/(rect.bottom-rect.top)*canvas.height
-		var canvas = $("#canvas")[0];
-		var cbr = canvas.getBoundingClientRect();
-		for (var i=0; i<event.x.length; i++) {
-			var ex = event.x[i];
-			segment.x[i] = (ex-cbr.left)/(cbr.right-cbr.left)*canvas.width;
-		}
-		for (var i=0; i<event.y.length; i++) {
-			var ex = event.y[i];
-			segment.y[i] = (ex-cbr.top)/(cbr.bottom-cbr.top)*canvas.height;
-		}
-		console.log(segment);
-		segment.color = color;
-		segment.width = size;
-		ws.send(JSON.stringify({draw: segment}));
+		fingwb.global.canvas.ctx = fingwb.global.canvas.get().getContext('2d');
+		fingwb.global.canvas.ctx.lineCap = "round";
+
+		fingwb.setMode('draw');
 	}
 	function str2Col (str) {
 		var i, hash, colour;
