@@ -171,10 +171,10 @@
 
 	function initCanvas() {
 		$('#clear-canvas').on('click', function() {
-			ws.send(JSON.stringify({clear: true}));
+			fingwb.global.ws.send(JSON.stringify({clear: true}));
 		});
 		$('#size-control').on('change', function() {
-			size = $(this).val();
+			fingwb.mode.draw.data.size = $(this).val();
 		})
 		$('#colorpicker').spectrum({
 			clickoutFiresChange: true,
