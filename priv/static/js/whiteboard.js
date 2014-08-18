@@ -65,7 +65,14 @@
 						});
 					})();
 				},
-				uninstall: function() {},
+				uninstall: function() {
+					var canvas = $(fingwb.global.canvas.get());
+					$(window).off('mouseup.fingwb.draw');
+					var events = ['mouseup', 'mousedown', 'mousemove', 'MSPointerMove', 'MSPointerDown', 'touchmove', 'touchstart'];
+					for (var i in events) {
+						canvas.off(i +'.fingwb.draw');
+					}
+				},
 				startSegment: function(x, y) {
 					return {
 						x: [x],
