@@ -173,9 +173,20 @@
 		$('#clear-canvas').on('click', function() {
 			fingwb.global.ws.send(JSON.stringify({clear: true}));
 		});
-		$('#size-control').on('change', function() {
+		$('#size-control').noUiSlider({
+			start: 5,
+			step: 1,
+			range: {
+				'min': 1,
+				'max': 150
+			},
+			serialization: {
+				lower: [ $.Link({target: $('#size-display')})]
+			}
+		});
+		$('#size-control').on({'slide': function() {
 			fingwb.mode.draw.data.size = $(this).val();
-		})
+		}});
 		$('#colorpicker').spectrum({
 			clickoutFiresChange: true,
 			showPalette: true,

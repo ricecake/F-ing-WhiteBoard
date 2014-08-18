@@ -17,6 +17,11 @@
 	height:15%;
 }
 
+#size-control {
+	width: 50%;
+	display: inline-block;
+}
+
 #canvas {
 	cursor: crosshair;
 	border-bottom: 3px solid black;
