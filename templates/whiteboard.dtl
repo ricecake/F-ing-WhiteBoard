@@ -1,11 +1,11 @@
 <html>
 	<head>
-		<link rel='stylesheet' href='/css/spectrum.css' />
-		<link rel="stylesheet" href="/css/jquery.nouislider.css" />
+		<link rel='stylesheet' href='/css/lib/spectrum.css' />
+		<link rel="stylesheet" href="/css/lib/jquery.nouislider.css" />
 		<link rel="stylesheet" type="text/css" href="/css/whiteboard.css" media="all">
 		<script type="text/javascript" src="/js/lib/jquery-2.1.1.min.js"></script>
-		<script src="/js/jquery.nouislider.min.js"></script>
-		<script src='/js/spectrum.js'></script>
+		<script src="/js/lib/jquery.nouislider.min.js"></script>
+		<script src='/js/lib/spectrum.js'></script>
 		<script type="text/javascript" src="/js/whiteboard.js"></script>
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<title>
