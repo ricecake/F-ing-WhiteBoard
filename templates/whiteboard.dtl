@@ -1,12 +1,15 @@
 <html>
 	<head>
-		<link rel='stylesheet' href='/css/lib/spectrum.css' />
-		<link rel="stylesheet" href="/css/lib/jquery.nouislider.css" />
-		<link rel="stylesheet" type="text/css" href="/css/whiteboard.css" media="all">
-		<script type="text/javascript" src="/js/lib/jquery-2.1.1.min.js"></script>
+		<link href='/css/lib/spectrum.css' rel='stylesheet' type="text/css" />
+		<link href="/css/lib/jquery.nouislider.css" rel="stylesheet" type="text/css" />
+		<link href="/css/whiteboard.css" rel="stylesheet" type="text/css" media="all">
+		<script src="/js/lib/jquery-2.1.1.min.js" type="text/javascript" ></script>
+		<script src="/js/lib/underscore.js" type="text/javascript" ></script>
+		<script src="/js/lib/ring.js" type="text/javascript" ></script>
 		<script src="/js/lib/jquery.nouislider.min.js"></script>
 		<script src='/js/lib/spectrum.js'></script>
-		<script type="text/javascript" src="/js/whiteboard.js"></script>
+		<script src="/js/whiteboard.js" type="text/javascript" ></script>
+
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 		<title>
 			Fing WhiteBoard: {{ whiteboard_id }}

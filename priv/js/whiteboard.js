@@ -1,3 +1,7 @@
+function Cake() {
+	return this;
+}
+
 (function() {
 	'use strict';
 	var fingwb = {
