@@ -22,9 +22,27 @@
 	display: inline-block;
 }
 
-#canvas {
-	cursor: crosshair;
+#canvas-container {
+	position: relative;
+
+	cursor: none;
 	border-bottom: 3px solid black;
 	width: 100%;
 	height: 85%;
+}
+
+.canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width:100%;
+	height:100%;
+}
+
+#clever-canvas-overlay-name-sebastian-will-think-of {
+	z-index: 200;
+}
+
+#canvas {
+	z-index: 100;
 }
