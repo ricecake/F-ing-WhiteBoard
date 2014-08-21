@@ -7,6 +7,7 @@ It's an F-ing Whiteboard app.
 Installing:
 -----------
 
+0. ensure you have erlang installed, preferably from erlang solutions.
 1. ./rebar get-deps
 2. ./rebar compile generate
 
