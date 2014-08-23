@@ -54,4 +54,7 @@ Alternate Method
 
     q().
 
-
+To Contribute:
+-------------
+Fork the repo, and make your changes in a branch with an appropriate name
+Then, open a pull request, and upon review, it'll be merged in, and shortly thereafter into master.
