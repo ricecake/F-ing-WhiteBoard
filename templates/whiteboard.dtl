@@ -21,7 +21,7 @@
 		</div>
 		<div class='content'>
 			<div id='canvas-container' >
-				<canvas id='clever-canvas-overlay-name-sebastian-will-think-of' width="1800" height="900" class='canvas'></canvas>
+				<canvas id='system-overlay' width="1800" height="900" class='canvas'></canvas>
 				<canvas id='canvas' class='canvas' width="1800" height="900" ></canvas>
 			</div>
 			<div id='controls'>

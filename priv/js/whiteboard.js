@@ -270,7 +270,7 @@
 	}
 	function clearCanvasNeedingCleverNameFromSebastian () {
 		// Store the current transformation matrix
-		var canvasWithCleverName = document.getElementById('clever-canvas-overlay-name-sebastian-will-think-of');
+		var canvasWithCleverName = document.getElementById('system-overlay');
 		var ctx = canvasWithCleverName.getContext('2d');
 		ctx.save();
 		// Use the identity matrix while clearing the canvas
@@ -281,16 +281,16 @@
 		ctx.restore();
 	}
 
-	$(document).on('mousemove', '#clever-canvas-overlay-name-sebastian-will-think-of', function(event) {
+	$(document).on('mousemove', '#system-overlay', function(event) {
 		trackMouse(event);
 	});
 
-	$(document).on('mouseout', '#clever-canvas-overlay-name-sebastian-will-think-of', function(event) {
+	$(document).on('mouseout', '#system-overlay', function(event) {
 		clearCanvasNeedingCleverNameFromSebastian(event);
 	});
 
 	function trackMouse(event) {
-		var canvasWithCleverName = document.getElementById('clever-canvas-overlay-name-sebastian-will-think-of');
+		var canvasWithCleverName = document.getElementById('system-overlay');
 		var ctx = canvasWithCleverName.getContext('2d');
 		ctx.globalCompositeOperation = "source-over";
 		clearCanvasNeedingCleverNameFromSebastian();
