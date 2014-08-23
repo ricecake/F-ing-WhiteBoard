@@ -270,12 +270,12 @@
 	}
 	function clearSystemOverlay () {
 		// Store the current transformation matrix
-		var canvasWithCleverName = document.getElementById('system-overlay');
-		var ctx = canvasWithCleverName.getContext('2d');
+		var systemOverlay = document.getElementById('system-overlay');
+		var ctx = systemOverlay.getContext('2d');
 		ctx.save();
 		// Use the identity matrix while clearing the canvas
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, canvasWithCleverName.width, canvasWithCleverName.height);
+		ctx.clearRect(0, 0, systemOverlay.width, systemOverlay.height);
 
 		// Restore the transform
 		ctx.restore();
