@@ -306,10 +306,8 @@
 		ctx.globalCompositeOperation = "source-over";
 		clearSystemOverlay();
 
-		var selectedSize = fingwb.mode.draw.data.size;
-
 		// Radius of circle, actual line is, apparently .5 the size of the arc that would be drawn using that size?
-		var r = fingwb.mode.draw.data.size - (selectedSize * .5);
+		var r = fingwb.mode.draw.data.size * .5;
 		var x;
 		var y;
 
