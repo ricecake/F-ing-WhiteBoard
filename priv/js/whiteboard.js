@@ -268,7 +268,7 @@
 		for (i = 0, colour = ""; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
 		return colour;
 	}
-	function clearCanvasNeedingCleverNameFromSebastian () {
+	function clearSystemOverlay () {
 		// Store the current transformation matrix
 		var canvasWithCleverName = document.getElementById('system-overlay');
 		var ctx = canvasWithCleverName.getContext('2d');
@@ -286,14 +286,14 @@
 	});
 
 	$(document).on('mouseout', '#system-overlay', function(event) {
-		clearCanvasNeedingCleverNameFromSebastian(event);
+		clearSystemOverlay(event);
 	});
 
 	function trackMouse(event) {
-		var canvasWithCleverName = document.getElementById('system-overlay');
-		var ctx = canvasWithCleverName.getContext('2d');
+		var systemOverlay = document.getElementById('system-overlay');
+		var ctx = systemOverlay.getContext('2d');
 		ctx.globalCompositeOperation = "source-over";
-		clearCanvasNeedingCleverNameFromSebastian();
+		clearSystemOverlay();
 
 		var selectedSize = fingwb.mode.draw.data.size;
 
@@ -304,12 +304,12 @@
 
 
 		// Yep, that's right, I totally stole Sebastian's code.. I'm ok with it.
-		var cbr = canvasWithCleverName.getBoundingClientRect();
+		var cbr = systemOverlay.getBoundingClientRect();
 		var ex = event.clientX;
 		var ey = event.clientY;
-		x = (ex-cbr.left)/(cbr.right-cbr.left)*canvasWithCleverName.width;
+		x = (ex-cbr.left)/(cbr.right-cbr.left)*systemOverlay.width;
 
-		y = (ey-cbr.top)/(cbr.bottom-cbr.top)*canvasWithCleverName.height;
+		y = (ey-cbr.top)/(cbr.bottom-cbr.top)*systemOverlay.height;
 
 		// x = event.clientX - 8 + document.body.scrollLeft + document.documentElement.scrollLeft;
 		// y = event.clientY - 8 + document.body.scrollTop + document.documentElement.scrollTop;
