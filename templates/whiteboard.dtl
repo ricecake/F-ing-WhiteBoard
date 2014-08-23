@@ -20,7 +20,10 @@
 			<div id='viewers'></div>
 		</div>
 		<div class='content'>
-			<canvas id='canvas' width="1800" height="900"></canvas>
+			<div id='canvas-container' >
+				<canvas id='clever-canvas-overlay-name-sebastian-will-think-of' width="1800" height="900" class='canvas'></canvas>
+				<canvas id='canvas' class='canvas' width="1800" height="900" ></canvas>
+			</div>
 			<div id='controls'>
 				<div class='input-container'>
 					<label for='colorpicker'> Color:</label><input id='colorpicker' data-role='none' type='color' name='color' value='#000000' />

@@ -30,6 +30,8 @@
 		}
 	});
 
+	
+
 	var fingwb = {
 		setMode: function(mode) {
 			fingwb.mode[fingwb.mode.current].uninstall();
@@ -40,6 +42,7 @@
 			canvas: {
 				ctx: '',
 				get: function (){ return $("#canvas")[0] },
+				getContainer: function (){ return $("#canvas-container")[0] },
 				getImageData: function() {
 					var canvas = fingwb.global.canvas.get();
 					return canvas.getContext('2d').getImageData(0,0, canvas.width, canvas.height);
@@ -77,7 +80,7 @@
 					size: 5
 				},
 				install: function() {
-					var canvas = $(fingwb.global.canvas.get());
+					var canvas = $(fingwb.global.canvas.getContainer());
 					(function() {
 						var segment;
 						canvas.on("touchstart.fingwb.draw", function(e) {
@@ -246,7 +249,7 @@
 		$('#colorpicker').spectrum({
 			clickoutFiresChange: true,
 			showPalette: true,
-                        showAlpha: true,
+						showAlpha: true,
 			change: function(newColor) {
 				fingwb.mode.draw.data.color = newColor.toRgbString();
 			},
@@ -265,4 +268,60 @@
 		for (i = 0, colour = ""; i < 3; colour += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
 		return colour;
 	}
+	function clearCanvasNeedingCleverNameFromSebastian () {
+		// Store the current transformation matrix
+		var canvasWithCleverName = document.getElementById('clever-canvas-overlay-name-sebastian-will-think-of');
+		var ctx = canvasWithCleverName.getContext('2d');
+		ctx.save();
+		// Use the identity matrix while clearing the canvas
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, canvasWithCleverName.width, canvasWithCleverName.height);
+
+		// Restore the transform
+		ctx.restore();
+	}
+
+	$(document).on('mousemove', '#clever-canvas-overlay-name-sebastian-will-think-of', function(event) {
+		trackMouse(event);
+	});
+
+	$(document).on('mouseout', '#clever-canvas-overlay-name-sebastian-will-think-of', function(event) {
+		clearCanvasNeedingCleverNameFromSebastian(event);
+	});
+
+	function trackMouse(event) {
+		var canvasWithCleverName = document.getElementById('clever-canvas-overlay-name-sebastian-will-think-of');
+		var ctx = canvasWithCleverName.getContext('2d');
+		ctx.globalCompositeOperation = "source-over";
+		clearCanvasNeedingCleverNameFromSebastian();
+
+		var selectedSize = fingwb.mode.draw.data.size;
+
+		// Radius of circle, actual line is, apparently .5 the size of the arc that would be drawn using that size?
+		var r = fingwb.mode.draw.data.size - (selectedSize * .5);
+		var x;
+		var y;
+
+
+		// Yep, that's right, I totally stole Sebastian's code.. I'm ok with it.
+		var cbr = canvasWithCleverName.getBoundingClientRect();
+		var ex = event.clientX;
+		var ey = event.clientY;
+		x = (ex-cbr.left)/(cbr.right-cbr.left)*canvasWithCleverName.width;
+
+		y = (ey-cbr.top)/(cbr.bottom-cbr.top)*canvasWithCleverName.height;
+
+		// x = event.clientX - 8 + document.body.scrollLeft + document.documentElement.scrollLeft;
+		// y = event.clientY - 8 + document.body.scrollTop + document.documentElement.scrollTop;
+
+		ctx.strokeStyle = '#777';
+		ctx.lineWidth = 3;
+		ctx.beginPath();
+		ctx.arc(x, y, r, 0, Math.PI * 2, true);
+		ctx.closePath();
+		ctx.fillStyle = fingwb.mode.draw.data.color;
+		ctx.stroke();
+		ctx.fill();
+	};
+
 }());
