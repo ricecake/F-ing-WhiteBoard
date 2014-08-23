@@ -289,6 +289,17 @@
 		clearSystemOverlay(event);
 	});
 
+	function remapCoordinate(canvas, x, y) {
+		var NewX, NewY;
+		var cbr = canvas.getBoundingClientRect();
+		NewX = (x-cbr.left)/(cbr.right-cbr.left)*canvas.width;
+		NewY = (y-cbr.top )/(cbr.bottom-cbr.top)*canvas.height;
+		return {
+			x: NewX,
+			y: NewY
+		};
+	}
+	
 	function trackMouse(event) {
 		var systemOverlay = document.getElementById('system-overlay');
 		var ctx = systemOverlay.getContext('2d');
