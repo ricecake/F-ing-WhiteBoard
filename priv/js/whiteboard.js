@@ -306,27 +306,13 @@
 		ctx.globalCompositeOperation = "source-over";
 		clearSystemOverlay();
 
-		// Radius of circle, actual line is, apparently .5 the size of the arc that would be drawn using that size?
 		var r = fingwb.mode.draw.data.size * .5;
-		var x;
-		var y;
-
-
-		// Yep, that's right, I totally stole Sebastian's code.. I'm ok with it.
-		var cbr = systemOverlay.getBoundingClientRect();
-		var ex = event.clientX;
-		var ey = event.clientY;
-		x = (ex-cbr.left)/(cbr.right-cbr.left)*systemOverlay.width;
-
-		y = (ey-cbr.top)/(cbr.bottom-cbr.top)*systemOverlay.height;
-
-		// x = event.clientX - 8 + document.body.scrollLeft + document.documentElement.scrollLeft;
-		// y = event.clientY - 8 + document.body.scrollTop + document.documentElement.scrollTop;
+		var NewCoords = remapCoordinate(systemOverlay, event.clientX, event.clientY);
 
 		ctx.strokeStyle = '#777';
 		ctx.lineWidth = 3;
 		ctx.beginPath();
-		ctx.arc(x, y, r, 0, Math.PI * 2, true);
+		ctx.arc(NewCoords.x, NewCoords.y, r, 0, Math.PI * 2, true);
 		ctx.closePath();
 		ctx.fillStyle = fingwb.mode.draw.data.color;
 		ctx.stroke();
