@@ -1,11 +1,10 @@
 -module(fingwb_whiteboard).
 
--export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, list/0, readArchive/1, prune/0, clear/1]).
+-export([init/1, create/0, exists/1, delete/1, watch/1, unWatch/1, publish/2, notify/2, watchers/1, list/0, readArchive/1, clear/1]).
 
 -record(board, {
 	id,
-	used=false,
-	epoch
+	timer
 }).
 
 -record(watcher, {
@@ -41,20 +40,19 @@ init([]) ->
 		end
 	end,
 	[ok = CreateTable(Table) || Table <- ?Tables ],
-	{ok, _TRef} = timer:apply_interval(30000, fingwb_whiteboard, prune, []),
 	ok.
 
 create() ->
-	{atomic, Result} = mnesia:transaction(fun creator/0),
+	{atomic, {ok, Id} = Result} = mnesia:transaction(fun creator/0),
+	ok = setTimeout(Id),
 	Result.
 
 creator() ->
 	Id = getNewId(),
 	case mnesia:read({board, Id}) of
 		[] ->
-			TimeStamp = timestamp(),
-			ok = mnesia:write(#board{id=Id, epoch=TimeStamp}),
-			{ok, {Id, TimeStamp}};
+			ok = mnesia:write(#board{id=Id, timer=undefined}),
+			{ok, Id};
 		_  -> creator()
 	end.
 
@@ -83,12 +81,11 @@ delete(Id) when is_binary(Id) ->
 	Result.
 
 watch(Id) when is_binary(Id) ->
+	clearTimeout(Id),
 	{atomic, Result} = mnesia:transaction(fun()->
 		case mnesia:read({board, Id}) of
 			[]    -> undefined;
-			[Row] ->
-				mnesia:write(#watcher{pid=self(), board_id=Id}),
-				mnesia:write(Row#board{used=true})
+			[_Row] -> mnesia:write(#watcher{pid=self(), board_id=Id})
 		end
 	end),
 	Result.
@@ -101,7 +98,7 @@ unWatch(Id) when is_binary(Id) ->
 		end
 	end),
 	ok = case watchers(Id) of
-		[] -> {ok, _} = timer:apply_after(10000, fingwb_whiteboard, delete, [Id]), ok;
+		[] -> setTimeout(Id);
 		_  -> ok
 	end,
 	Result.
@@ -162,19 +159,25 @@ list() ->
 	end),
 	Boards.
 
-prune() ->
-	mnesia:transaction(fun()->
-		mnesia:foldl(
-			fun(#board{id=Id, used=false}, Acc)->
-				case watchers(Id) of
-					[] ->
-						delete(Id),
-						Acc+1;
-					_  -> Acc
-				end;
-			(#board{}, Acc)-> Acc
-		end, 0, board)
-	end).
+setTimeout(Id) when is_binary(Id) ->
+	{ok, Tref} = timer:apply_after(10000, fingwb_whiteboard, delete, [Id]),
+	{atomic, _Result} = mnesia:transaction(fun()->
+		case mnesia:read({board, Id}) of
+			[]    -> undefined;
+			[Row] -> mnesia:write(Row#board{timer=Tref})
+		end
+	end),
+	ok.
+
+clearTimeout(Id) when is_binary(Id) ->
+	{atomic, Result} = mnesia:transaction(fun()->
+		case mnesia:read({board, Id}) of
+			[]    -> undefined;
+			[Row] -> Row#board.timer
+		end
+	end),
+	timer:cancel(Result).
+
 
 getNewId() -> erlang:integer_to_binary(binary:decode_unsigned(crypto:rand_bytes(8)), 36).
 timestamp() -> {Mega, Secs, Micro} = erlang:now(),  Mega*1000*1000*1000*1000 + Secs * 1000 * 1000 + Micro.
