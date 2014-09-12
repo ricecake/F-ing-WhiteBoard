@@ -54,6 +54,8 @@ Alternate Method
 
     q().
 
+additionally, devStart.sh may be used to start the app as above, while also re-loading the code when changes are made, to ease development.
+
 To Contribute:
 -------------
 Fork the repo, and make your changes in a branch with an appropriate name
