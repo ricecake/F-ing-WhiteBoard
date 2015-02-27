@@ -1,37 +1,6 @@
 (function() {
 	'use strict';
 
-	var Tool = ring.create({
-		constructor: function(args) {
-			this.data = args['data'] || {};
-			this.name = args.name;
-			this.loc  = args.location;
-			return this;
-		}
-	});
-	var Brush = ring.create([Tool], {
-		constructor: function(args) {
-			this.adjusters = args.adjusters;
-			return this.$super(args)
-		}
-	});
-	var Paint = ring.create([Brush], {
-		constructor: function() {
-			return this.$super({
-				data: {
-					color: 'rgba(00,00,00,1)',
-					size:  5
-				},
-				name: 'Paint',
-				location: ['Tools', 'Brush', 'Paint'],
-				adjusters: {}
-			});
-			return this;
-		}
-	});
-
-	
-
 	var fingwb = {
 		setMode: function(mode) {
 			fingwb.mode[fingwb.mode.current].uninstall();
