@@ -179,7 +179,7 @@
 	
 	function initWs() {
 		var WhiteBoardId = $('body').data('whiteboard');
-		var ws = new WebSocket("ws://" + window.location.host + "/ws/" + WhiteBoardId);
+		var ws = new WebSocket("wss://" + window.location.host + "/ws/" + WhiteBoardId);
 		ws.onclose   = function(evt) {
 			window.setTimeout(function(){
 				initWs();
