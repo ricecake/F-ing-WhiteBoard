@@ -168,18 +168,22 @@
 				var id = str2Col(viewer);
 				$('#' + id).remove();
 			}
-		}		
+		}
 	};
 	$(document).ready(init);
-	
+
 	function init() {
 		initWs();
 		initCanvas();
 	}
-	
+
 	function initWs() {
+		var protocol = 'wss:';
+		if (window.location.protocol === 'http:') {
+			protocol = 'ws:';
+		}
 		var WhiteBoardId = $('body').data('whiteboard');
-		var ws = new WebSocket("wss://" + window.location.host + "/ws/" + WhiteBoardId);
+		var ws = new WebSocket(protocol+"//" + window.location.host + "/ws/" + WhiteBoardId);
 		ws.onclose   = function(evt) {
 			window.setTimeout(function(){
 				initWs();
@@ -265,7 +269,7 @@
 		NewY = (y-cbr.top )/(cbr.bottom-cbr.top)*canvas.height;
 		return { x: NewX, y: NewY };
 	}
-	
+
 	function trackMouse(event) {
 		var systemOverlay = document.getElementById('system-overlay');
 		var ctx = systemOverlay.getContext('2d');
